@@ -190,6 +190,7 @@ const NavBar = () => {
   const [isCartOpen, setCartOpen] = useState(false);
   const [isSignUpOpen, setSignUpOpen] = useState(false);
   const [activeLink, setActiveLink] = useState("Home");
+  const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     if (!isCartOpen) return;
@@ -197,6 +198,13 @@ const NavBar = () => {
     document.addEventListener("click", closeOnOutside);
     return () => document.removeEventListener("click", closeOnOutside);
   }, [isCartOpen]);
+
+  useEffect(() => {
+    if (!isMobileMenuOpen) return;
+    const closeOnOutside = () => setMobileMenuOpen(false);
+    document.addEventListener("click", closeOnOutside);
+    return () => document.removeEventListener("click", closeOnOutside);
+  }, [isMobileMenuOpen]);
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
@@ -206,6 +214,7 @@ const NavBar = () => {
 
   const handleNavClick = (e, link) => {
     e.preventDefault();
+    setMobileMenuOpen(false);
     if (link.label === "Sign Up") {
       setSignUpOpen(true);
       return;
@@ -218,7 +227,19 @@ const NavBar = () => {
     <nav className="site-nav" id="top">
       <div className="container-xl d-flex justify-content-between align-items-center flex-wrap gap-3">
         <a href="#top" className="brand" onClick={(e) => { e.preventDefault(); handleNavClick(e, {label: "Home", target: "top"}); }}>Eco-Mart</a>
-        <ul className="nav-links d-flex mb-0">
+        <button
+          type="button"
+          className="hamburger-btn d-lg-none"
+          aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
+          aria-expanded={isMobileMenuOpen}
+          onClick={(e) => { e.stopPropagation(); setMobileMenuOpen(prev => !prev); }}
+        >
+          <i className={"fa-solid " + (isMobileMenuOpen ? "fa-xmark" : "fa-bars")}></i>
+        </button>
+        <ul
+          className={"nav-links mb-0" + (isMobileMenuOpen ? " mobile-open" : "")}
+          onClick={(e) => e.stopPropagation()}
+        >
           {navLinks.map(link => (
             <li key={link.label}>
               <a
@@ -231,7 +252,7 @@ const NavBar = () => {
             </li>
           ))}
           <li>
-            <a href="#" onClick={(e) => { e.preventDefault(); setSignUpOpen(true); }}>Sign Up</a>
+            <a href="#" onClick={(e) => { e.preventDefault(); setMobileMenuOpen(false); setSignUpOpen(true); }}>Sign Up</a>
           </li>
         </ul>
         <div className="nav-right">
@@ -640,11 +661,11 @@ const BrowseCategory = () => {
 const NewArrival = () => (
   <section className="container-xl py-5">
     <SectionHeading eyebrow="Featured" title="New Arrival" />
-    <div className="row g-3" style={{minHeight:'520px'}}>
+    <div className="row g-3 new-arrival-row">
       <div className="col-lg-6">
         <div
-          className="arrival-tile h-100"
-          style={{minHeight:'520px', backgroundImage:"url('https://images.unsplash.com/photo-1607853202273-797f1c22a38e?q=80&w=900&auto=format&fit=crop')"}}
+          className="arrival-tile arrival-tile-hero h-100"
+          style={{backgroundImage:"url('https://images.unsplash.com/photo-1607853202273-797f1c22a38e?q=80&w=900&auto=format&fit=crop')"}}
         >
           <div className="tile-body">
             <h3>PlayStation 5</h3>
@@ -655,9 +676,9 @@ const NewArrival = () => (
       </div>
       <div className="col-lg-6">
         <div className="row g-3 h-100">
-          <div className="col-12" style={{height:'250px'}}>
+          <div className="col-12 arrival-sub-tile-wrap">
             <div
-              className="arrival-tile h-100"
+              className="arrival-tile arrival-sub-tile h-100"
               style={{backgroundImage:"url('https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=900&auto=format&fit=crop')"}}
             >
               <div className="tile-body">
@@ -667,26 +688,26 @@ const NewArrival = () => (
               </div>
             </div>
           </div>
-          <div className="col-6" style={{height:'250px'}}>
+          <div className="col-6 arrival-sub-tile-wrap">
             <div
-              className="arrival-tile h-100"
+              className="arrival-tile arrival-sub-tile h-100"
               style={{backgroundImage:"url('https://images.unsplash.com/photo-1545454675-3531b543be5d?q=80&w=600&auto=format&fit=crop')"}}
             >
               <div className="tile-body">
-                <h3 style={{fontSize:'18px'}}>Speakers</h3>
-                <p style={{fontSize:'12px'}}>Amazon wireless speakers</p>
+                <h3 className="tile-title-sm">Speakers</h3>
+                <p className="tile-text-sm">Amazon wireless speakers</p>
                 <a href="#" className="tile-link">Shop Now</a>
               </div>
             </div>
           </div>
-          <div className="col-6" style={{height:'250px'}}>
+          <div className="col-6 arrival-sub-tile-wrap">
             <div
-              className="arrival-tile h-100"
+              className="arrival-tile arrival-sub-tile h-100"
               style={{backgroundImage:"url('https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?q=80&w=600&auto=format&fit=crop')"}}
             >
               <div className="tile-body">
-                <h3 style={{fontSize:'18px'}}>Perfume</h3>
-                <p style={{fontSize:'12px'}}>GUCCI Intense Oud EDP</p>
+                <h3 className="tile-title-sm">Perfume</h3>
+                <p className="tile-text-sm">GUCCI Intense Oud EDP</p>
                 <a href="#" className="tile-link">Shop Now</a>
               </div>
             </div>
@@ -736,7 +757,7 @@ const Footer = () => {
     <footer style={{background:'#000',color:'#fff'}} className="pt-5 pb-4 mt-4" id="contact-us">
       <div className="container-xl">
         <div className="row g-4">
-          <div className="col-lg-3">
+          <div className="col-6 col-md-4 col-lg-3">
             <h5>Eco-Mart</h5>
             <p className="mt-3 mb-2">Subscribe</p>
             <p className="small text-white-50">Get 10% off your first order</p>
@@ -751,13 +772,13 @@ const Footer = () => {
               <button type="submit" aria-label="Subscribe"><i className="fa-solid fa-paper-plane"></i></button>
             </form>
           </div>
-          <div className="col-lg-3">
+          <div className="col-6 col-md-4 col-lg-3">
             <h6>Support</h6>
             <p className="small text-white-50 mt-3 mb-1">111 Bijoy sarani, Dhaka, DH 1515, Bangladesh</p>
             <p className="small text-white-50 mb-1"><a href="mailto:exclusive@gmail.com" className="footer-link">exclusive@gmail.com</a></p>
             <p className="small text-white-50"><a href="tel:+8801588889999" className="footer-link">+88015-88888-9999</a></p>
           </div>
-          <div className="col-lg-2">
+          <div className="col-6 col-md-4 col-lg-2">
             <h6>Account</h6>
             <ul className="small text-white-50 mt-3">
               <li className="mb-1"><a href="#" className="footer-link">My Account</a></li>
@@ -766,7 +787,7 @@ const Footer = () => {
               <li><a href="#" className="footer-link">Wishlist</a></li>
             </ul>
           </div>
-          <div className="col-lg-2">
+          <div className="col-6 col-md-4 col-lg-2">
             <h6>Quick Link</h6>
             <ul className="small text-white-50 mt-3">
               <li className="mb-1"><a href="#" className="footer-link">Privacy Policy</a></li>
@@ -774,7 +795,7 @@ const Footer = () => {
               <li><a href="#" className="footer-link">FAQ</a></li>
             </ul>
           </div>
-          <div className="col-lg-2">
+          <div className="col-6 col-md-4 col-lg-2">
             <h6>Download App</h6>
             <p className="small text-white-50 mt-3 mb-2">Save $3 with App New User Only</p>
             <div className="app-badges">
